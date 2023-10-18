@@ -9,8 +9,8 @@ const auth = require("../../middlewares/authenticate")
 router.post("/register",validateBody(registerValidationRecruiter), recruiterController.register)
 router.post("/login",validateBody(loginValidation),recruiterController.login);
 router.get("/verify/:verificationToken",recruiterController.activate);
-router.patch('/avatars',loader.single("avatar"),recruiterController.uploadAvatar);
-router.post('/logout',recruiterController.logout);
+router.patch('/avatars',auth,loader.single("avatar"),recruiterController.uploadAvatar);
+router.post('/logout',auth,recruiterController.logout);
 router.post('/refresh',recruiterController.refresh);
 
 module.exports = router;

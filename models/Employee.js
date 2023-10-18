@@ -42,7 +42,8 @@ const employeeSchema = new Schema({
     type:Number,
   },
   resumeUrl:{
-    type:String
+    type:String,
+    default:null
   },
   
 }, { versionKey: false, timestamps: true });

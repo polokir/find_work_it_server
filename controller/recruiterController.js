@@ -1,9 +1,12 @@
 const RecruiterModel = require("../models/Recruiter");
 const HttpError = require("../errors/errorHandler");
-const mailsender = require("../middlewares/mailsender");
+// const mailsender = require("../middlewares/mailsender");
 const RecruiterService = require("../service/RecruiterService");
-const TokenService = require("../service/TokenService");
 const Token = require("../models/Token");
+const path = require("path");
+const avatarDir = path.join(__dirname, "../", "public", "avatars");
+const fs = require("fs/promises");
+const modifier = require("../middlewares/photomodifier");
 
 class RecruiterController {
   async register(req, res, next) {
@@ -48,21 +51,28 @@ class RecruiterController {
     res.status(200).json({ message: "Verification successful" });
   }
 
-  async uploadAvatar(req, res) {
-    const { _id } = req.user;
-    const { path: tempDirectory, originalname } = req.file;
-    const fileName = `${_id}_${originalname}`;
+  async uploadAvatar(req, res,next) {
+    try {
+      console.log(req);
+      const { id } = req.user;
+      const { path: tempDirectory, originalname } = req.file;
+      const fileName = `${id}_${originalname}`;
 
-    const destinationFile = path.join(avatarDir, fileName);
+      const destinationFile = path.join(avatarDir, fileName);
 
-    await modifier(tempDirectory);
+      await modifier(tempDirectory);
 
-    await fs.rename(tempDirectory, destinationFile);
+      await fs.rename(tempDirectory, destinationFile);
 
-    const avatarURL = path.join("avatars", fileName);
-    await RecruiterModel.findByIdAndUpdate(_id, { avatarURL });
+      const avatarURL = path.join("avatars", fileName);
+      await RecruiterModel.findByIdAndUpdate(id, { avatarURL });
 
-    res.json({ avatarURL });
+      res.json({ avatarURL });
+    } catch (error) {
+      console.log(req);
+
+      next(HttpError(500,error.message))
+    }
   }
 
   async login(req, res, next) {
@@ -73,7 +83,10 @@ class RecruiterController {
       if (!recruiter) {
         next(HttpError(404, "Not found"));
       }
-      res.cookie('refreshToken',recruiter.tokens.refreshToken,{maxAge:30*34*60*60*1000,httpOnly:true});
+      res.cookie("refreshToken", recruiter.tokens.refreshToken, {
+        maxAge: 30 * 34 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
       res.status(201).json(recruiter);
     } catch (error) {
       console.log(error);
@@ -84,7 +97,7 @@ class RecruiterController {
     try {
       const { refreshToken } = req.cookies;
       const token = await RecruiterService.logut(refreshToken);
-      res.clearCookie('refreshToken');
+      res.clearCookie("refreshToken");
       res.status(204).json(token);
     } catch (error) {
       console.log(error);

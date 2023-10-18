@@ -2,7 +2,7 @@ const HttpError = require("../errors/errorHandler");
 const VacancyService = require("../service/VacancyService");
 const path = require("path");
 const fs = require("fs/promises");
-const rezumeDir = path.join(__dirname, "../", "public", "rezumes");
+
 
 class VacancyController{
     
@@ -75,11 +75,6 @@ class VacancyController{
         }
     }
 
-    async uploadRezume(req,res,next){
-        const {user} = req;
-        const { path: tempDirectory, originalname } = req.file;
-        const fileName = `${user.id}_${originalname}`;
-    }
 }
 
 module.exports = new VacancyController();
