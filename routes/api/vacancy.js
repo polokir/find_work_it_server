@@ -9,5 +9,6 @@ router.get("/:id",vacancyController.getById);
 router.get("",vacancyController.getAll);
 router.patch("",auth,vacancyController.update);
 router.delete("/:id",auth,vacancyController.removeVacancy);
+router.patch("/:idx",auth,vacancyController.applyVacancy);
 
 module.exports = router;

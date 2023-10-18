@@ -11,6 +11,6 @@ router.post('/register',validateBody(registerValidationEmployee),employeeControl
 router.post('/login',validateBody(loginValidation),employeeController.login);
 router.post('/logout',auth,employeeController.logout);
 router.patch('/rezume',auth,loader.single("rezume"),employeeController.uploadRezume);
-router.patch('/avatar',auth,loader.single("avatart"),employeeController.uploadRezume);
+router.patch('/avatar',auth,loader.single("avatar"),employeeController.uploadRezume);
 
 module.exports =router;

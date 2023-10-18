@@ -1,4 +1,4 @@
-const VacancyModel = require("../models/Vacancy");
+
 
 class VacancyService {
   async create(body,recruiter) {
