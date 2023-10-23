@@ -1,6 +1,5 @@
 const HttpError = require("../errors/errorHandler");
 const VacancyService = require("../service/VacancyService");
-const VacancyModel = require("../models/Vacancy");
 const path = require("path");
 const fs = require("fs/promises");
 
@@ -12,7 +11,6 @@ class VacancyController {
       if (Object.keys(req.user).includes("skills")) {
         return next(HttpError(403, "WRONG ROLE ACTION FORBIDEN"));
       }
-      // console.log("user",req.user);
       const vacancy = await VacancyService.create(body, id);
       if (!vacancy) {
         next(HttpError(403, "not created"));
@@ -79,13 +77,25 @@ class VacancyController {
       if (Object.keys(req.user).includes("company_name")) {
         return next(HttpError(403, "WRONG ROLE ACTION FORBIDEN"));
       }
-      const applied = await VacancyModel.findByIdAndUpdate(idx, {
-        $addToSet: { employee: id },
-        $inc:{apply_count:1}
-      });
+      const applied = await VacancyService.apply(id, idx);
       return res.json(applied);
     } catch (error) {
-        next(HttpError(500,error.message));
+      next(HttpError(500, error.message));
+    }
+  }
+
+  async getCandidates(req, res, next) {
+    try {
+      const { id } = req.user;
+      const {vacancyId} = req.params;
+      if (Object.keys(req.user).includes("skills")) {
+        return next(HttpError(403, "WRONG ROLE ACTION FORBIDEN"));
+      }
+      const employess = await VacancyService.getCandidates(id,vacancyId);
+      console.log(employess);
+      return res.json(employess.flatMap(item=>item.employee));
+    } catch (error) {
+        next(HttpError(500, error.message));
     }
   }
 }

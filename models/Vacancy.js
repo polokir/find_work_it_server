@@ -32,8 +32,7 @@ const vacancySchema = new Schema({
         ref:"recruiter",
     },
     employee:{
-        type:[Schema.Types.ObjectId],
-        ref:"employee",
+        type:[{ type: Schema.Types.ObjectId, ref: 'employee' }],
     }
 },{ versionKey: false, timestamps: true });
 
