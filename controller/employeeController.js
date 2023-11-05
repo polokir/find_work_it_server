@@ -12,7 +12,7 @@ class EmployeeController {
     try {
       const employee = await EmployeeService.register({ ...req.body });
       res.cookie("refreshToken", employee.refreshToken, {
-        maxAge: 30 * 34 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
       return res.status(200).json(employee);
