@@ -1,7 +1,12 @@
 const express = require("express");
-const logger = require("morgan");
-const cors = require("cors");
 const app = express();
+const logger = require("morgan");
+var cors = require("cors");
+app.use(cors({
+  credentials:true,
+  origin:'http://localhost:3000',
+  ptionsSuccessStatus: 200
+}));
 const recrutRouter = require("./routes/api/recruiter");
 const employeeRouter = require("./routes/api/employee");
 const vacancyRouter = require("./routes/api/vacancy");
@@ -10,7 +15,7 @@ require("dotenv").config();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
-app.use(cors());
+
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/employee", employeeRouter);

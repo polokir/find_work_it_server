@@ -34,6 +34,10 @@ const employeeSchema = new Schema({
     required:true,
     default:0
   },
+  position:{
+    type:String,
+    required:true,
+  },
   skills:{
     type:[String],
     default:[]
@@ -45,6 +49,10 @@ const employeeSchema = new Schema({
     type:String,
     default:null
   },
+  city:{
+    type:String,
+    default:null
+  }
   
 }, { versionKey: false, timestamps: true });
 

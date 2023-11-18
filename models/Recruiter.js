@@ -18,6 +18,10 @@ const recruiterSchema = new Schema({
     type:String,
     required:true,
   },
+  type_of_company:{
+    type:String,
+    required:true,
+  },
   avatarURL:{
     type:String,
   },

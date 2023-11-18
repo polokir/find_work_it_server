@@ -9,7 +9,7 @@ const TokenService = require("./TokenService");
 const Token = require("../models/Token");
 
 class RecruiterService {
-  async register(email, password, name, company_name) {
+  async register(email, password, name, company_name,type_of_company) {
     const hashPassword = await bcrypt.hash(password, 3);
     const verificationToken = uuid.v4();
     const avatarURL = gravatar.url(email);
@@ -26,6 +26,7 @@ class RecruiterService {
       avatarURL,
       company_name,
       verificationToken,
+      type_of_company
     });
 
     const recruiterDTO = new RecruiterDTO(newRecruiter);
@@ -41,10 +42,13 @@ class RecruiterService {
 
   async login(email, password) {
     const person = await RecruiterModel.findOne({ email });
+    if (!person) {
+      return null;
+    }
     const hashPass = await bcrypt.compare(password, person.password);
 
-    if (!person || !hashPass) {
-      return HttpError(401, "невірна почта або пароль");
+    if (!hashPass) {
+      return null;
     }
 
     const recruiterDTO = new RecruiterDTO(person);
@@ -83,6 +87,7 @@ class RecruiterService {
     };
   }
 
+  as
 
 }
 

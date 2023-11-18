@@ -18,6 +18,7 @@ class VacancyController {
       }
       res.status(201).json(vacancy);
     } catch (error) {
+      console.log(error.message, "|VACANCY CREATE CONTROLLER|");
       next(HttpError(500, error.message));
     }
   }
@@ -96,6 +97,16 @@ class VacancyController {
       return res.json(employess.flatMap(item=>item.employee));
     } catch (error) {
         next(HttpError(500, error.message));
+    }
+  }
+
+  async getRecruiterVacancy(req, res, next) {
+    try {
+      const { id } = req.user;
+      const vacancy = await VacancyService.getRecruiterVacancy(id);
+      return res.json(vacancy);
+    } catch (error) {
+      next(HttpError(500, error.message));
     }
   }
 }

@@ -31,6 +31,10 @@ const vacancySchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"recruiter",
     },
+    location:{
+        type:String,
+        default:null
+    },
     employee:{
         type:[{ type: Schema.Types.ObjectId, ref: 'employee' }],
     }

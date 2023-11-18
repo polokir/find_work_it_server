@@ -13,4 +13,5 @@ router.patch('/avatars',auth,loader.single("avatar"),recruiterController.uploadA
 router.post('/logout',auth,recruiterController.logout);
 router.post('/refresh',recruiterController.refresh);
 
+
 module.exports = router;

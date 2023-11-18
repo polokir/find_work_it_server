@@ -19,7 +19,7 @@ const registerValidationRecruiter = Joi.object(
         "string.max": "Password shoul be less than 30 characters",
       }),
     email: Joi.string().pattern(emailRegEx).required(),
-
+    type_of_company: Joi.string(),
     company_name: Joi.string().required().messages({
       "any.required": "Company name is required",
     }),
@@ -59,6 +59,9 @@ const registerValidationEmployee = Joi.object({
     "any.required": "Experience is required",
     "number.base": "Experience must be a number",
   }),
+  city: Joi.string(),
+
+  position: Joi.string(),
 
   skills: Joi.array().items(Joi.string()),
 

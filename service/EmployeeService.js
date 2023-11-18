@@ -7,7 +7,7 @@ const TokenService = require("./TokenService");
 const EmployeeDTO = require("../dtos/EmployeeDTO");
 
 class EmployeeService{
-    async register({email, password, name,age,experience,salary_level,resumeUrl}){
+    async register({email, password, name,age,experience,salary_level,resumeUrl,city,position}){
         console.log(email,password);
         const hashPassword = await bcrypt.hash(password, 5);
         const verificationToken = uuid.v4();
@@ -27,6 +27,8 @@ class EmployeeService{
             verificationToken,
             experience,
             salary_level,
+            city,
+            position,
             resumeUrl
         })
         const employeeDTO = new EmployeeDTO(newEmployee);
@@ -52,7 +54,7 @@ class EmployeeService{
         await TokenService.pushToken(employeeDTO.id,tokens.refreshToken);
         
         return {
-            ...tokens,
+            tokens,
             employee:employeeDTO
         }
     }

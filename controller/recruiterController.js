@@ -11,7 +11,7 @@ const modifier = require("../middlewares/photomodifier");
 class RecruiterController {
   async register(req, res, next) {
     try {
-      const { email, password, name, company_name } = req.body;
+      const { email, password, name, company_name,type_of_company } = req.body;
       const person = await RecruiterModel.findOne({ email });
       if (person) {
         res
@@ -23,7 +23,8 @@ class RecruiterController {
         email,
         password,
         name,
-        company_name
+        company_name,
+        type_of_company
       );
       res.cookie("refreshToken", recruiter.refreshToken, {
         maxAge: 30 * 34 * 60 * 60 * 1000,
@@ -32,6 +33,7 @@ class RecruiterController {
       return res.status(200).json(recruiter);
     } catch (error) {
       next(error);
+      console.log(error.message);
     }
   }
 
@@ -120,6 +122,8 @@ class RecruiterController {
       return res.status(200).json(refreshed);
     } catch (error) {}
   }
+
+  
 }
 
 module.exports = new RecruiterController();

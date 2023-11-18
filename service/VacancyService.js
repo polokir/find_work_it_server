@@ -4,11 +4,16 @@ const VacancyModel = require("../models/Vacancy");
 
 class VacancyService {
   async create(body,recruiter) {
-    const newVacancy = await VacancyModel.create({
-      ...body,
-      recruiter
-    });
-    return newVacancy;
+    try {
+      const newVacancy = await VacancyModel.create({
+        ...body,
+        recruiter
+      });
+      return newVacancy;
+    } catch (error) {
+      console.log(error.message, "|VACANCY CREATE SERVICE|");
+    }
+   
   }
 
   async getVacancyById(id){
@@ -59,6 +64,10 @@ class VacancyService {
     return result;
   }
   
+  async getRecruiterVacancy(recruiterId){
+    const result = await VacancyModel.find({recruiter:recruiterId}).exec();
+    return result || null;
+  }
 }
 
 module.exports = new VacancyService();
