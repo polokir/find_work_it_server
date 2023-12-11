@@ -22,7 +22,7 @@ app.use("/api/employee", employeeRouter);
 app.use("/api/recrut", recrutRouter);
 app.use("/vacancy",vacancyRouter);
 
-app.use(express.static("public"));
+app.use("/public",express.static("public"));
 
 app.all("*", (_, res) => {
   res.status(404).json({

@@ -1,17 +1,18 @@
 const RecruiterModel = require("../models/Recruiter");
 const HttpError = require("../errors/errorHandler");
-// const mailsender = require("../middlewares/mailsender");
 const RecruiterService = require("../service/RecruiterService");
 const Token = require("../models/Token");
 const path = require("path");
 const avatarDir = path.join(__dirname, "../", "public", "avatars");
 const fs = require("fs/promises");
 const modifier = require("../middlewares/photomodifier");
+const EmployeeService = require("../service/EmployeeService");
+const { groupBy, monthIndexToName } = require("../middlewares/math-functions");
 
 class RecruiterController {
   async register(req, res, next) {
     try {
-      const { email, password, name, company_name,type_of_company } = req.body;
+      const { email, password, name, company_name, type_of_company } = req.body;
       const person = await RecruiterModel.findOne({ email });
       if (person) {
         res
@@ -53,9 +54,8 @@ class RecruiterController {
     res.status(200).json({ message: "Verification successful" });
   }
 
-  async uploadAvatar(req, res,next) {
+  async uploadAvatar(req, res, next) {
     try {
-      console.log(req);
       const { id } = req.user;
       const { path: tempDirectory, originalname } = req.file;
       const fileName = `${id}_${originalname}`;
@@ -66,14 +66,13 @@ class RecruiterController {
 
       await fs.rename(tempDirectory, destinationFile);
 
-      const avatarURL = path.join("avatars", fileName);
+      const avatarURL = `avatars/${fileName}`;
       await RecruiterModel.findByIdAndUpdate(id, { avatarURL });
 
-      res.json({ avatarURL });
+      res.json({ avatarURL: `avatars/${fileName}` });
     } catch (error) {
-      console.log(req);
-
-      next(HttpError(500,error.message))
+      console.log(error.message);
+      next(HttpError(500, error.message));
     }
   }
 
@@ -123,7 +122,34 @@ class RecruiterController {
     } catch (error) {}
   }
 
-  
+  async getPlatformStat(req, res, next) {
+    try {
+      const { from, to } = req.query;
+      const allRecrut = await RecruiterService.getAllPeople(
+        new Date(from),
+        new Date(to)
+      );
+      const allEmployees = await EmployeeService.getAllPeople(
+        new Date(from),
+        new Date(to)
+      );
+
+      const groupedRecruts =  groupBy(allRecrut,(item) => item.createdAt.getMonth());
+      const groupedEmployees = groupBy(allEmployees,(item) => item.createdAt.getMonth());
+      
+      const finalStatRecrut = {};
+      const finalStatEmployee ={};
+
+      for (const month in groupedRecruts) {
+        finalStatRecrut[monthIndexToName(parseInt(month))] = groupedRecruts[month].length;
+      }
+      
+      for (const month in groupedEmployees) {
+        finalStatEmployee[monthIndexToName(parseInt(month))] = groupedEmployees[month].length;
+      }
+      res.json({finalStatRecrut,finalStatEmployee});
+    } catch (error) {}
+  }
 }
 
 module.exports = new RecruiterController();

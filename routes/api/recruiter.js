@@ -6,6 +6,8 @@ const router = express.Router();
 const loader = require("../../middlewares/staticLoader")
 const auth = require("../../middlewares/authenticate")
 
+
+router.get("/stat",recruiterController.getPlatformStat);
 router.post("/register",validateBody(registerValidationRecruiter), recruiterController.register)
 router.post("/login",validateBody(loginValidation),recruiterController.login);
 router.get("/verify/:verificationToken",recruiterController.activate);

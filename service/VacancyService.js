@@ -17,7 +17,10 @@ class VacancyService {
   }
 
   async getVacancyById(id){
-    const vacancy = await VacancyModel.findById(id);
+    const vacancy = await VacancyModel.findById(id).populate({
+      path:"recruiter",
+      select:"name company_name avatarURL "
+    });
     return vacancy
   }
 
@@ -47,6 +50,13 @@ class VacancyService {
     return allVacancies;
   }
 
+  async getAllForStatistic(from,to,select){
+    const allVacancies = await VacancyModel.find({
+      createdAt:{$gte: from, $lte: to}
+    }).select(select);
+    return allVacancies;
+  }
+
   async apply(userId,id){
     const result = await VacancyModel.findByIdAndUpdate(id, { 
       $push: { employee: userId },
@@ -59,7 +69,7 @@ class VacancyService {
   async getCandidates(userId,idx){
     const result = await VacancyModel.find({recruiter:userId,_id:idx}).populate({
       path:'employee',
-      select:"name email"
+      select:"name email skills avatarURL age experience position city resumeUrl",
     }).exec();
     return result;
   }
@@ -67,6 +77,21 @@ class VacancyService {
   async getRecruiterVacancy(recruiterId){
     const result = await VacancyModel.find({recruiter:recruiterId}).exec();
     return result || null;
+  }
+
+  async getAppliedVacancy(employeeId){
+    const result = await VacancyModel.find({ employee: { $in: employeeId } })
+    return result || null;
+  }
+  
+  async searchVacancyByTitle(title){
+    try {
+      const result = await VacancyModel.find({title:title});
+    return result || null;
+    } catch (error) {
+     console.log(error.message); 
+    }
+    
   }
 }
 

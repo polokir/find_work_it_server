@@ -39,20 +39,25 @@ class EmployeeController {
   }
 
   async uploadAvatar(req, res) {
-    const { _id } = req.user;
-    const { path: tempDirectory, originalname } = req.file;
-    const fileName = `${_id}_${originalname}`;
+    try {
+      const { id } = req.user;
+      const { path: tempDirectory, originalname } = req.file;
+      const fileName = `${id}_${originalname}`;
 
-    const destinationFile = path.join(avatarDir, fileName);
+      const destinationFile = path.join(avatarDir, fileName);
 
-    await modifier(tempDirectory);
+      await modifier(tempDirectory);
+    
+      await fs.rename(tempDirectory, destinationFile);
 
-    await fs.rename(tempDirectory, destinationFile);
+      const avatarURL = `avatars/${fileName}`
+      await EmployeeModel.findByIdAndUpdate(id, { avatarURL });
 
-    const avatarURL = path.join("avatars", fileName);
-    await EmployeeModel.findByIdAndUpdate(_id, { avatarURL });
-
-    res.json({ avatarURL });
+      res.json({ avatarURL:`avatars/${fileName}` });
+    } catch (error) {
+      console.log(error.message);
+      next(HttpError(500,error.message))
+    }
   }
 
   async uploadRezume(req, res, next) {
@@ -63,10 +68,12 @@ class EmployeeController {
     const destinationFile = path.join(rezumeDir, fileName);
     await fs.rename(tempDirectory, destinationFile);
 
-    const resumeUrl = path.join("rezumes", destinationFile);
+    const resumeUrl = `rezumes/${fileName}`;
     await EmployeeModel.findByIdAndUpdate(id,{resumeUrl})
     res.json({resumeUrl});
   }
+
+ 
 }
 
 module.exports = new EmployeeController();

@@ -87,8 +87,12 @@ class RecruiterService {
     };
   }
 
-  as
-
+  async getAllPeople(from,to){
+    const allRecrut = await RecruiterModel.find({
+      createdAt:{$gte:from, $lte:to}
+    }).select("createdAt");
+    return allRecrut || null;
+  }
 }
 
 module.exports = new RecruiterService();
