@@ -41,19 +41,25 @@ class VacancyService {
     return deletedVacancy;
   }
 
-  async getAll(){
+  async getAll(next,limit){
     const allVacancies = await VacancyModel.find().populate({
       path:"recruiter",
       select:"name email company_name avatarURL "
-    });
-  
+    }).skip(next).limit(limit);
+   
     return allVacancies;
+  }
+
+  async getTotalNumber (){
+    const total = await VacancyModel.countDocuments();
+    return total;
   }
 
   async getAllForStatistic(from,to,select){
     const allVacancies = await VacancyModel.find({
       createdAt:{$gte: from, $lte: to}
     }).select(select);
+    console.log(allVacancies)
     return allVacancies;
   }
 

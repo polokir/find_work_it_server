@@ -27,53 +27,74 @@ class EmployeeController {
       console.log(employee);
       if (!employee) {
         next(HttpError(404, "Not found"));
+        return;
       }
+      res.cookie("refreshToken", employee.refreshToken, {
+        maxAge: 30 * 34 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
       res.json(employee);
     } catch (error) {}
   }
 
   async logout(req, res, next) {
-    const { refreshToken } = req.body;
-    await EmployeeService.logut(refreshToken);
-    res.status(204).json();
+    try {
+      const { refreshToken } = req.cookies;
+      const token = await EmployeeService.logut(refreshToken);
+      res.clearCookie("refreshToken");
+      res.status(204).json(token);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  async uploadAvatar(req, res) {
+  async uploadAvatar(req, res, next) {
     try {
       const { id } = req.user;
+      const employee = await EmployeeModel.findById(id);
+      const oldAvatarURL = employee.avatarURL.replace(/^avatars\//, '');
+
+      if (oldAvatarURL) {
+        const oldAvatarPath = path.join(avatarDir,oldAvatarURL);
+        try {
+          console.log(oldAvatarPath)
+          await fs.access(oldAvatarPath);
+          await fs.unlink(oldAvatarPath);
+        } catch (error) {
+          console.log(`Old avatar file not found at ${oldAvatarPath}`);
+        }
+      }
       const { path: tempDirectory, originalname } = req.file;
       const fileName = `${id}_${originalname}`;
 
       const destinationFile = path.join(avatarDir, fileName);
 
       await modifier(tempDirectory);
-    
+
       await fs.rename(tempDirectory, destinationFile);
 
-      const avatarURL = `avatars/${fileName}`
+      const avatarURL = `avatars/${fileName}`;
       await EmployeeModel.findByIdAndUpdate(id, { avatarURL });
 
-      res.json({ avatarURL:`avatars/${fileName}` });
+      res.json({ avatarURL: `avatars/${fileName}` });
     } catch (error) {
       console.log(error.message);
-      next(HttpError(500,error.message))
+      next(HttpError(500, error.message));
     }
   }
 
   async uploadRezume(req, res, next) {
     const { id } = req.user;
-    const { path:tempDirectory, originalname } = req.file;
+    const { path: tempDirectory, originalname } = req.file;
     const fileName = `${id}_${originalname}`;
 
     const destinationFile = path.join(rezumeDir, fileName);
     await fs.rename(tempDirectory, destinationFile);
 
     const resumeUrl = `rezumes/${fileName}`;
-    await EmployeeModel.findByIdAndUpdate(id,{resumeUrl})
-    res.json({resumeUrl});
+    await EmployeeModel.findByIdAndUpdate(id, { resumeUrl });
+    res.json({ resumeUrl });
   }
-
- 
 }
 
 module.exports = new EmployeeController();

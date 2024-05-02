@@ -57,6 +57,20 @@ class RecruiterController {
   async uploadAvatar(req, res, next) {
     try {
       const { id } = req.user;
+      const recruiter = await RecruiterModel.findById(id);
+
+      const oldAvatarURL = recruiter.avatarURL.replace(/^avatars\//, '');
+
+      if (oldAvatarURL) {
+        const oldAvatarPath = path.join(avatarDir,oldAvatarURL);
+        try {
+          console.log(oldAvatarPath)
+          await fs.access(oldAvatarPath);
+          await fs.unlink(oldAvatarPath);
+        } catch (error) {
+          console.log(`Old avatar file not found at ${oldAvatarPath}`);
+        }
+      }
       const { path: tempDirectory, originalname } = req.file;
       const fileName = `${id}_${originalname}`;
 
@@ -80,11 +94,12 @@ class RecruiterController {
     try {
       const { email, password } = req.body;
       const recruiter = await RecruiterService.login(email, password);
-
+      
       if (!recruiter) {
         next(HttpError(404, "Not found"));
+        return;
       }
-      res.cookie("refreshToken", recruiter.tokens.refreshToken, {
+      res.cookie("refreshToken", recruiter.refreshToken, {
         maxAge: 30 * 34 * 60 * 60 * 1000,
         httpOnly: true,
       });
@@ -107,8 +122,9 @@ class RecruiterController {
 
   async refresh(req, res, next) {
     try {
-      const { id } = req.body;
-      const RefreshToken = await Token.findOne({ user: id });
+      console.log(req.cookies)
+      const { refreshToken } = req.cookies;
+      const RefreshToken = await Token.findOne({ refreshToken: refreshToken });
 
       if (!RefreshToken) {
         return next(HttpError(403, "Unathorized"));

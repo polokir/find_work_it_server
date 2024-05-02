@@ -43,6 +43,7 @@ class RecruiterService {
   async login(email, password) {
     const person = await RecruiterModel.findOne({ email });
     if (!person) {
+      console.log(person,"|RECR LOGIN|")
       return null;
     }
     const hashPass = await bcrypt.compare(password, person.password);
@@ -53,11 +54,12 @@ class RecruiterService {
 
     const recruiterDTO = new RecruiterDTO(person);
     const tokens = TokenService.createTokens({ ...recruiterDTO });
+  
     console.log("recruiter login", recruiterDTO);
     await TokenService.pushToken(recruiterDTO.id, tokens.refreshToken);
 
     return {
-      tokens,
+      ...tokens,
       recruiter: recruiterDTO,
     };
   }

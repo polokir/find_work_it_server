@@ -67,7 +67,7 @@ class EmployeeService {
     await TokenService.pushToken(employeeDTO.id, tokens.refreshToken);
 
     return {
-      tokens,
+      ...tokens,
       employee: employeeDTO,
     };
   }

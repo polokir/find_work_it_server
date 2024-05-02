@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 const emailRegEx =
   /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/;
-const passwordRegEx = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d].{8,30}$/;
+const passwordRegEx = /^(?=.*[A-Za-z])/;
 
 const registerValidationRecruiter = Joi.object(
   {

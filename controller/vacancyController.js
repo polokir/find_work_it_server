@@ -15,7 +15,7 @@ class VacancyController {
     try {
       const { id } = req.user;
       const { body } = req;
-
+      
       if (Object.keys(req.user).includes("skills")) {
         return next(HttpError(403, "WRONG ROLE ACTION FORBIDEN"));
       }
@@ -75,9 +75,21 @@ class VacancyController {
 
   async getAll(req, res, next) {
     try {
-      const allVacancies = await VacancyService.getAll();
+      const {page=1, limit=20} = req.query
+      const skip = (page-1)*limit;
+      const allVacancies= await VacancyService.getAll(skip,limit);
       return res.status(200).json(allVacancies);
     } catch (error) {}
+  }
+
+  async getTotal(req, res, next){
+    try {
+      const total = await VacancyService.getTotalNumber();
+      console.log(total)
+      res.status(200).json({total:total});
+    } catch (error) {
+      
+    }
   }
 
   async applyVacancy(req, res, next) {
@@ -174,12 +186,15 @@ class VacancyController {
 
   async MedianaSalaryToMonth(req, res, next) {
     const { from, to } = req.query;
+    console.log(new Date(from))
 
     const vacancies = await VacancyService.getAllForStatistic(
       new Date(from),
       new Date(to),
       "salary createdAt year_of_experience"
     );
+
+    console.log(vacancies)
 
     const mappedVacancies = vacancies.filter((item) => {
       const currentVacancyDate = new Date(item.createdAt);

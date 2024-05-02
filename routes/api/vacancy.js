@@ -4,6 +4,7 @@ const auth = require("../../middlewares/authenticate");
 const vacancyController = require('../../controller/vacancyController');
 
 router.get('/search', vacancyController.searchVacancyByTitle);
+router.get("/totalnumb",vacancyController.getTotal);
 router.get("/statistcs/get-excel",vacancyController.getExcell);
 router.get("/statistcs",vacancyController.MedianaSalaryToMonth);
 router.get("/can/:vacancyId",auth,vacancyController.getCandidates);
