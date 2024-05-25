@@ -8,35 +8,32 @@ const fs = require("fs/promises");
 const modifier = require("../middlewares/photomodifier");
 const EmployeeService = require("../service/EmployeeService");
 const { groupBy, monthIndexToName } = require("../middlewares/math-functions");
+const BaseController = require("./baseController");
+const express = require('express');
+const loader = require("../middlewares/staticLoader")
 
-class RecruiterController {
-  async register(req, res, next) {
-    try {
-      const { email, password, name, company_name, type_of_company } = req.body;
-      const person = await RecruiterModel.findOne({ email });
-      if (person) {
-        res
-          .status(409)
-          .json({ message: `User with email ${email} already exists` });
-        return;
-      }
-      const recruiter = await RecruiterService.register(
-        email,
-        password,
-        name,
-        company_name,
-        type_of_company
-      );
-      res.cookie("refreshToken", recruiter.refreshToken, {
-        maxAge: 30 * 34 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-      return res.status(200).json(recruiter);
-    } catch (error) {
-      next(error);
-      console.log(error.message);
-    }
+const auth = require("../middlewares/authenticate");
+
+class RecruiterController extends BaseController {
+
+  constructor(userService){
+    super(userService);
+    this.router = express.Router();
+    this.initializeRoutes();
   }
+
+  initializeRoutes(){
+    this. router.get('/refresh',this.refresh);
+    this.router.post('/register', this.register.bind(this));
+    this.router.post('/login', this.login.bind(this));
+    this.router.post('/logout', this.logout.bind(this));
+    this.router.get("/stat",this.getPlatformStat);
+    this.router.patch('/avatar',auth,loader.single("avatar"),this.uploadAvatar);
+    this.router.post('/logout',auth,this.logout);
+    //this.router.get("/verify/:verificationToken",recruiterController.activate);
+  }
+
+
 
   async activate(req, res, next) {
     const { verificationToken } = req.params;
@@ -90,36 +87,6 @@ class RecruiterController {
     }
   }
 
-  async login(req, res, next) {
-    try {
-      const { email, password } = req.body;
-      const recruiter = await RecruiterService.login(email, password);
-      
-      if (!recruiter) {
-        next(HttpError(404, "Not found"));
-        return;
-      }
-      res.cookie("refreshToken", recruiter.refreshToken, {
-        maxAge: 30 * 34 * 60 * 60 * 1000,
-        httpOnly: true,
-      });
-      res.status(201).json(recruiter);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async logout(req, res, next) {
-    try {
-      const { refreshToken } = req.cookies;
-      const token = await RecruiterService.logut(refreshToken);
-      res.clearCookie("refreshToken");
-      res.status(204).json(token);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   async refresh(req, res, next) {
     try {
       console.log(req.cookies)
@@ -168,4 +135,4 @@ class RecruiterController {
   }
 }
 
-module.exports = new RecruiterController();
+module.exports = (userService) => new RecruiterController(userService).router;

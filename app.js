@@ -7,7 +7,9 @@ app.use(cors({
   origin:'http://localhost:3000',
   ptionsSuccessStatus: 200
 }));
-const recrutRouter = require("./routes/api/recruiter");
+//const recrutRouter = require("./routes/api/recruiter");
+const recrutService = require('./service/RecruiterService')
+const recruiterController = require('./controller/recruiterController')(recrutService);
 const employeeRouter = require("./routes/api/employee");
 const vacancyRouter = require("./routes/api/vacancy");
 const cookieParser = require("cookie-parser");
@@ -19,7 +21,7 @@ app.use(logger(formatsLogger));
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/employee", employeeRouter);
-app.use("/api/recrut", recrutRouter);
+app.use("/api/recrut", recruiterController);
 app.use("/vacancy",vacancyRouter);
 
 app.use("/public",express.static("public"));

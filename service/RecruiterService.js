@@ -9,7 +9,9 @@ const TokenService = require("./TokenService");
 const Token = require("../models/Token");
 
 class RecruiterService {
-  async register(email, password, name, company_name,type_of_company) {
+  async register({email, password, name, company_name,type_of_company}) {
+    console.log(email,"-----RECRUT SERVICE REGISTER METHOD------");
+
     const hashPassword = await bcrypt.hash(password, 3);
     const verificationToken = uuid.v4();
     const avatarURL = gravatar.url(email);
@@ -40,7 +42,8 @@ class RecruiterService {
     };
   }
 
-  async login(email, password) {
+  async login({email, password}) {
+    console.log(email,"-----RECRUT SERVICE LOGIN METHOD-----")
     const person = await RecruiterModel.findOne({ email });
     if (!person) {
       console.log(person,"|RECR LOGIN|")
@@ -64,7 +67,7 @@ class RecruiterService {
     };
   }
 
-  async logut(refreshToken) {
+  async logout(refreshToken) {
     const token = await TokenService.removeToken(refreshToken);
     return token;
   }
