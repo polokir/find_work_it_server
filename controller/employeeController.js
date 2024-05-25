@@ -50,20 +50,22 @@ class EmployeeController {
 
   async uploadAvatar(req, res, next) {
     try {
-      const { id } = req.user;
-      const employee = await EmployeeModel.findById(id);
-      const oldAvatarURL = employee.avatarURL.replace(/^avatars\//, '');
+      const  {id}  = req.user;
+      console.log(id)
+      const recruiter = await EmployeeModel.findById(id);
 
-      if (oldAvatarURL) {
-        const oldAvatarPath = path.join(avatarDir,oldAvatarURL);
-        try {
-          console.log(oldAvatarPath)
-          await fs.access(oldAvatarPath);
-          await fs.unlink(oldAvatarPath);
-        } catch (error) {
-          console.log(`Old avatar file not found at ${oldAvatarPath}`);
-        }
-      }
+      console.log(recruiter.avatarURL,"V ROT EVBAL AJiFAFB")
+      // const oldAvatarURL = recruiter.avatarURL.replace(/^avatars\//, '');
+      // if (oldAvatarURL) {
+      //   const oldAvatarPath = path.join(avatarDir,oldAvatarURL);
+      //   try {
+      //     console.log(oldAvatarPath)
+      //     await fs.access(oldAvatarPath);
+      //     await fs.unlink(oldAvatarPath);
+      //   } catch (error) {
+      //     console.log(`Old avatar file not found at ${oldAvatarPath}`);
+      //   }
+      // }
       const { path: tempDirectory, originalname } = req.file;
       const fileName = `${id}_${originalname}`;
 
@@ -79,9 +81,9 @@ class EmployeeController {
       res.json({ avatarURL: `avatars/${fileName}` });
     } catch (error) {
       console.log(error.message);
-      next(HttpError(500, error.message));
     }
   }
+
 
   async uploadRezume(req, res, next) {
     const { id } = req.user;

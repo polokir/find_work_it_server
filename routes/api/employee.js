@@ -2,6 +2,8 @@ const express = require('express');
 const validateBody = require('../../middlewares/validator');
 const { registerValidationEmployee, loginValidation } = require('../../validations/user');
 const employeeController = require('../../controller/employeeController');
+const recruiterController = require('../../controller/recruiterController');
+
 const router = express.Router();
 const auth = require("../../middlewares/authenticate");
 const loader = require('../../middlewares/staticLoader');
