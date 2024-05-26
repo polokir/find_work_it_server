@@ -45,7 +45,7 @@ class EmployeeService {
       skills,
     });
     const employeeDTO = new EmployeeDTO(newEmployee);
-    const tokens = TokenService.createTokens({ employeeDTO });
+    const tokens = TokenService.createTokens({ ...employeeDTO });
     await TokenService.pushToken(employeeDTO.id, tokens.refreshToken);
 
     return {
@@ -72,7 +72,7 @@ class EmployeeService {
     };
   }
 
-  async logut(refreshToken) {
+  async logout(refreshToken) {
     const token = await TokenService.removeToken(refreshToken);
     return token;
   }
@@ -82,6 +82,15 @@ class EmployeeService {
       createdAt: { $gte: from, $lte: to },
     }).select("createdAt");
     return allRecrut || null;
+  }
+
+  async getById(id){
+    const person = await EmployeeModel.findById(id);
+    return person || null;
+  }
+
+  async updateAvatar(id, avatarURL){
+    await EmployeeModel.findByIdAndUpdate(id,{avatarURL});
   }
 }
 

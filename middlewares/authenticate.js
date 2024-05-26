@@ -15,7 +15,7 @@ module.exports = function(req,res,next){
       const accessToken = headerAuth.replace(/Bearer\s/,'');
       
       const userData = TokenService.isValidAccessToken(accessToken);
-      console.log(userData)
+      console.log(userData, "----USER DATA AUTH METHOD----")
       if(!userData){
         return next(HttpError(403,"Unath"));   
       }

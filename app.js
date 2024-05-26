@@ -10,7 +10,10 @@ app.use(cors({
 //const recrutRouter = require("./routes/api/recruiter");
 const recrutService = require('./service/RecruiterService')
 const recruiterController = require('./controller/recruiterController')(recrutService);
-const employeeRouter = require("./routes/api/employee");
+
+const employeeService = require("./service/EmployeeService");
+const employeeController = require("./controller/employeeController")(employeeService);
+
 const vacancyRouter = require("./routes/api/vacancy");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
@@ -20,7 +23,7 @@ app.use(logger(formatsLogger));
 
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api/employee", employeeRouter);
+app.use("/api/employee", employeeController);
 app.use("/api/recrut", recruiterController);
 app.use("/vacancy",vacancyRouter);
 

@@ -29,9 +29,8 @@ class TokenService{
 
     isValidAccessToken(token){
         try {
-            console.log(process.env.TOKEN_ACCESS_KEY)
           const tokenData = jwt.verify(token,process.env.TOKEN_ACCESS_KEY);
-          console.log("token valid",tokenData)
+          console.log("-----TOKEN SERVICE VALIDATION METHOD-----",tokenData)
           return tokenData;
         } catch (error) {
             return null;

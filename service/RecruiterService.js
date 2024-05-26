@@ -98,6 +98,15 @@ class RecruiterService {
     }).select("createdAt");
     return allRecrut || null;
   }
+
+  async getById(id ){
+    const person = await RecruiterModel.findById(id);
+    return person || null;
+  }
+
+  async updateAvatar(id, avatarURL){
+    await RecruiterModel.findByIdAndUpdate(id,{avatarURL});
+  }
 }
 
 module.exports = new RecruiterService();
